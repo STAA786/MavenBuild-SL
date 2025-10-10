@@ -1,0 +1,48 @@
+# =========================================================
+# Simplilearn DevOps Course-End Project
+# Project: Insured Assurance
+# Author: Siddiqui MD Tajammul Aakef
+# =========================================================
+# This GitHub Actions workflow builds your Maven project
+# and triggers Jenkins pipeline in the Simplilearn Lab.
+# =========================================================
+
+name: Insured Assurance CI/CD Pipeline
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  CICDjob:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java and Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'maven'
+
+      - name: Build Java Application
+        run: |
+          echo "🔧 Starting build for Insured Assurance..."
+          mvn clean package
+          echo "✅ Maven build completed successfully."
+
+      - name: Trigger Jenkins Deployment
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.LAB_HOST }}
+          username: ${{ secrets.LAB_USERNAME }}
+          password: ${{ secrets.LAB_PASSWORD }}
+          port: 22
+          script: |
+            echo "✅ Connected to Simplilearn Lab VM (${HOSTNAME})"
+            echo "🚀 Triggering Jenkins job: InsuredAssurance-Deployment"
+            curl -l -u admin:Root123$ http://localhost:8080/job/InsuredAssurance-Deployment/build?token=token1
+            echo "🎯 Jenkins Deployment Trigger Sent Successfully"
